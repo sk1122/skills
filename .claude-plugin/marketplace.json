@@ -1,12 +1,37 @@
 {
   "name": "sk1122",
-  "owner": { "name": "Satyam Kulkarni" },
-  "metadata": { "description": "Skills for coding agents." },
+  "owner": {
+    "name": "Satyam Kulkarni"
+  },
+  "metadata": {
+    "description": "Skills for coding agents."
+  },
   "plugins": [
     {
       "name": "silent-decisions",
       "source": "./plugins/silent-decisions",
       "description": "Stops coding agents from making important decisions silently: asks before choices that hurt the app later, raises past decisions that no longer fit, and records approved ones in decisions.md.",
+      "version": "0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "fix-without-overfitting",
+      "source": "./plugins/fix-without-overfitting",
+      "description": "Fix a pipeline from its real failures without teaching it the test set: failure cases, a frozen held-out set, checking the fix for names and ids copied from the failures, and proof on unseen data.",
+      "version": "0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "priced-in",
+      "source": "./plugins/priced-in",
+      "description": "Find out whether a prediction market knew before the news: pin the news moment, search for earlier leaks on the web and X, pull Polymarket prices and trades, explain each move, and give a verdict.",
+      "version": "0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "reply-review",
+      "source": "./plugins/reply-review",
+      "description": "Review an agent's proposal by quoting it: numbered proposal blocks, point-by-point answers to every quoted line, a tally of what is open, and nothing applied until you approve.",
       "version": "0.1.0",
       "license": "Apache-2.0"
     }

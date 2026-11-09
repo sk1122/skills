@@ -1,10 +1,13 @@
 # skills
 
-Skills for coding agents, packaged as a Claude Code plugin marketplace.
+Skills for coding agents. Each skill is a plain `SKILL.md`: instructions only, no bundled code. The agent uses its own tools (web search, fetch, shell) to carry them out, so the same skill works in Claude Code and in Codex.
 
 | Plugin | What it does |
 |---|---|
 | [silent-decisions](plugins/silent-decisions/skills/silent-decisions/SKILL.md) | Stops the agent from making important decisions silently. |
+| [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fixes a pipeline from its real failures without teaching it the test set. |
+| [priced-in](plugins/priced-in/skills/priced-in/SKILL.md) | Finds out whether a prediction market knew before the news. |
+| [reply-review](plugins/reply-review/skills/reply-review/SKILL.md) | Reviews a proposal point by point, by quoting it. |
 
 ## Install
 
@@ -15,10 +18,14 @@ In Claude Code:
 /plugin install silent-decisions@sk1122
 ```
 
-Or copy the skill folder into your own skills, where it becomes `/silent-decisions`:
+Install the others the same way, for example `/plugin install priced-in@sk1122`.
+
+Or copy a skill folder into your own skills, where it becomes `/<skill name>`:
 
 ```bash
-git clone https://github.com/sk1122/skills && cp -r skills/plugins/silent-decisions/skills/silent-decisions ~/.claude/skills/
+git clone https://github.com/sk1122/skills
+cp -r skills/plugins/*/skills/* ~/.claude/skills/    # Claude Code
+cp -r skills/plugins/*/skills/* ~/.codex/skills/     # Codex
 ```
 
 ## silent-decisions
