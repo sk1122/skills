@@ -1,0 +1,15 @@
+{
+  "name": "reply-review",
+  "version": "0.1.0",
+  "description": "Review an agent's proposal by quoting it: numbered proposal blocks, point-by-point answers to every quoted line, a tally of what is open, and nothing applied until you approve.",
+  "author": {
+    "name": "Satyam Kulkarni"
+  },
+  "repository": "https://github.com/sk1122/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "review",
+    "planning",
+    "workflow"
+  ]
+}
