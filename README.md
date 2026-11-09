@@ -5,7 +5,7 @@ A few skills I kept wishing I had while building with Claude Code and Codex. Eac
 | Skill | What it's for |
 |---|---|
 | [silent-decisions](plugins/silent-decisions/skills/silent-decisions/SKILL.md) | Make the agent ask before choices that come back to bite you |
-| [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fix bad outputs without just teaching the system its own examples |
+| [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fix the cause of a failure, not just the failing cases |
 | [priced-in](plugins/priced-in/skills/priced-in/SKILL.md) | Check whether a Polymarket market moved before the news did |
 | [reply-review](plugins/reply-review/skills/reply-review/SKILL.md) | Review a plan by quoting the lines you disagree with |
 
@@ -83,9 +83,9 @@ An entry looks like this:
 
 ## fix-without-overfitting
 
-When an LLM pipeline gets something wrong, the quick fix is to make those exact examples pass, by adding a line to the prompt about the name that kept failing or nudging a threshold until the bad cases flip. It looks fixed and it isn't.
+When a test fails, there's a cheap way to make it pass: hard-code the expected value, add an `if` for that one input, bump the timeout until the flaky test goes green, or just edit the test. Coding agents do this more than you'd think when they get stuck. With LLM pipelines it looks like a prompt line about the exact example that went wrong.
 
-This skill makes the agent write the failures down, set aside some data it won't look at, fix the cause instead of the cases, and check that no names or IDs from the failing examples ended up in the fix. Then it shows before-and-after numbers on the failures, on the set-aside data, and on cases that already worked. If only the failures improved, it says so.
+This skill makes the agent fix the cause instead. Before touching anything, it sets up a check on inputs the fix won't have seen: new test cases with different values for ordinary code, or a held-back sample for data and LLM pipelines. After the fix, it searches its own diff for values copied from the failures and shows before-and-after results on the failures, the unseen cases, and the cases that already worked. If only the failures improved, it says so.
 
 ## priced-in
 

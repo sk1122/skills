@@ -1,83 +1,87 @@
 ---
 name: fix-without-overfitting
-description: Fix a pipeline from its real failures without teaching it the test set. Turns bad outputs into failure cases, freezes a held-out set the fix never sees, writes the smallest general fix, checks the change for names and ids copied from the failing examples, and proves the gain holds on held-out data. Use when fixing wrong outputs from an LLM, prompt, classifier, extraction or ranking pipeline, or when the user says "failure cases first", "generalize", "no dataset-specific rules" or "don't overfit".
+description: Fix the cause of a failure instead of making the failing cases pass. Forbids special-casing (hard-coded expected values, branches keyed on the failing inputs, edited tests, thresholds nudged until cases flip, swallowed errors), checks the change for values copied from the failures, and proves the fix on cases it was not written against. Use when fixing failing tests, bug reports or wrong outputs from any code, including LLM, data and ranking pipelines, or when the user says "don't overfit", "no special cases", "fix it properly" or "failure cases first".
 ---
 
 # Fix without overfitting
 
-The easy way to fix a failing pipeline is to make the failing examples pass. A rule that mentions the airport from example 3, a prompt line about a politician who appeared twice, a threshold tuned until the five bad cases flip: each makes the failures pass and teaches the system nothing. You end up with a pipeline that's good at its own test set.
+There are two ways to make a failing case pass. One fixes the cause. The other teaches the code to recognise the case: a hard-coded expected value, an `if` for that one input, a timeout raised until the flaky test goes green, a prompt line about the exact example that went wrong. Both turn the test green. Only the first fixes anything.
 
-This skill fixes the cause, and proves it on data the fix never saw.
+Coding agents are known to take the second way when they get stuck. This skill rules it out.
+
+**The core rule: the fix must not be able to tell it's looking at one of the cases it was written for.** If it can, it isn't a fix.
 
 ## 1. Write down the failures
 
-For each bad output, record a case with:
-- `input`: the exact input;
-- `got`: what the pipeline produced;
-- `want`: what it should have produced, described as a behaviour ("the two reports of the same event are joined"), not a copied answer;
-- `why`: the kind of mistake, in general words ("treats a caption's account as the speaker").
+For each failure, note:
+- the input;
+- what happened;
+- what should have happened, described as a behaviour ("dates before 1970 parse correctly"), not as a copied value;
+- a guess at the kind of mistake.
 
-Save them as `failure-cases/<topic>.jsonl` (or the repo's existing place for cases). Use real outputs only, not invented ones.
+Use the real failures: the failing tests, the bug report or the bad outputs. Don't invent them.
 
-## 2. Freeze a held-out set before you fix anything
+## 2. Set up a check the fix can't see, before you fix anything
 
-Before touching code or prompts, set aside data the fix will never see:
-- **Held-out:** inputs from the same source and period as the failures that you haven't looked at. Take a fresh random sample. If you can't tell yet whether they pass or fail, that's fine; you'll judge before and after.
-- **Regression:** a sample of cases that pass today.
+Decide how you'll show the fix generalises, and do it first:
 
-Write down their ids, and don't open the held-out inputs while you design the fix. If no held-out data exists, say so and ask the user for some. A fix with no held-out set can't be shown to generalize.
+- **Ordinary code:** write a few new test cases for the same behaviour with *different* inputs from the failing ones, such as other values, edge cases and the opposite case. Where it fits, add a property test over a range of inputs. Keep the cases that already pass as a regression check.
+- **Data, LLM, ranking or other pipelines:** set aside a sample from the same source and period that you won't look at while fixing. Add a sample of cases that work today.
 
-## 3. Find the cause, not the case
+If neither is possible, say so. A fix you can only check against its own failures hasn't been shown to work.
 
-Group the failures by `why`, not by example. For each group, find the place in the pipeline that produces the mistake: the retrieval, the schema, a tool, a prompt rule, a threshold or the data.
+**Don't change the failing tests or their expected values.** If you believe a test itself is wrong, stop and tell the user why, rather than editing it.
 
-Prefer a fix in this order:
-1. the structure (schema, retrieval, the order of steps, what context is given);
-2. a general rule;
-3. a threshold;
-4. a prompt example.
+## 3. Find the cause
 
-Prompt examples are the most likely to be memorised.
+Group the failures by the kind of mistake, not by example. Find the line, step or rule that produces it.
 
-## 4. Write the smallest general fix
+If every failure seems to need its own fix, you haven't found the cause yet. Keep looking.
 
-Before writing the fix, check it against these rules:
-- **It names a class, not an instance.** "A caption's posting account is not the speaker of a quote" is a class. "@SomeAccount is not the speaker" is an instance.
-- **No names, places, organisations, numbers, ids or quoted phrases** from the failing inputs, in code, prompts, rules or tests of the runtime path. Test fixtures may contain them.
-- **No gold labels or expected answers** reachable at run time.
-- **No branches** that only the failing examples take.
-- **Thresholds come from a stated principle** or a sweep on non-held-out data. They're never tuned until the failures flip.
+## 4. Fix it without special-casing
 
-## 5. Check the fix for leaked words
+The fix must not contain any of these:
 
-Before you call the fix done, check it mechanically:
-1. **List the distinctive words in the failing inputs:** names of people, places and organisations, handles, numbers, ids, and unusual phrases. Leave out ordinary words.
-2. **Search the lines the fix adds** (`git diff`) for each one, case-insensitively. Ignore words the repository already used before the change.
-3. **Show the user every hit** with its file and line. For each one, either remove it and generalize, or explain why it's a genuine general term (for example, a field name the schema already uses).
+- **Copied values:** strings, IDs, file names, error messages, dates, numbers or names taken from the failing inputs or expected outputs. That covers code, config, prompts and rules.
+- **Input-keyed branches:** `if` or `switch` cases that only the failing inputs take.
+- **Nudged numbers:** a threshold, timeout, retry count or tolerance changed until the failures flip, with no reason that would hold for other inputs.
+- **Test edits:** changes to tests, fixtures, snapshots or expected outputs made to get a pass.
+- **Hidden errors:** catching, skipping or silencing the error the failure raised.
+- **Answers at run time:** test labels, gold answers or expected outputs that the running code can reach.
+- **For LLM prompts:** a rule or example that describes the failing case instead of the class it belongs to.
 
-Don't hide a hit by rewording it, for example spelling a name differently or describing it so closely that only that example matches.
+A good fix is about the class, not the instance. For example, "handle negative timestamps" rather than "handle `-86400`"; "a caption's account isn't the speaker of a quote" rather than "@SomeAccount isn't the speaker".
+
+## 5. Check the change for leaks
+
+Before calling it done:
+
+1. **List the distinctive values in the failures:** literals, IDs, names, numbers, unusual phrases and error text. Leave out ordinary words and the names of the code's own functions and fields.
+2. **Search the lines the fix adds** (`git diff`) for each one. Ignore any that were already in the code before the change.
+3. **Look over the diff** for new branches on specific inputs, changed numbers, and any edits to tests or fixtures.
+4. **Show the user every hit,** with file and line. Then either generalise it, or explain why it's genuinely general (a standard constant, or a field name the code already uses).
+
+Don't hide a hit by rewording it or building the same value another way.
 
 ## 6. Prove it
 
-Run all three sets before and after the fix. If a run costs money, estimate the cost first and ask.
+Run the failures, the unseen check and the regression set before and after the fix. If running them costs money, estimate the cost and ask first.
 
 | Set | Before | After |
 |---|---|---|
-| Failures (fix set) | 0 / n | ? / n |
-| Held-out | ? | ? |
+| The failures | 0 / n | ? / n |
+| Unseen cases (step 2) | ? | ? |
 | Regression | n / n | ? / n |
 
-The verdict:
-- **A general fix:** the failures improve, the held-out set improves or stays level where nothing was failing, and the regression set doesn't drop.
-- **Overfit:** the failures improve, but the held-out set doesn't improve on the same kind of mistake. Say so plainly, then go back to step 3.
-- **A trade-off:** the regression set drops. Show the cases that broke, and ask the user before keeping it.
+- **A real fix:** the failures pass, the unseen cases pass or improve on the same kind of mistake, and the regression set holds.
+- **Overfit:** the failures pass but the unseen cases don't. Say so plainly, and go back to step 3.
+- **A trade-off:** something in the regression set broke. Show what broke, and ask the user before keeping it.
 
 ## Report
 
-End with:
-- each failure group, its cause, and the fix in one line;
-- the table above;
-- the leak check result: clean, or each hit with its justification;
-- what's still failing, and why.
+- each kind of mistake, its cause and the fix, in one line each;
+- the table;
+- the leak check: clean, or each hit with its reason;
+- anything still failing, and why.
 
-Don't report "all failures fixed" without the held-out row.
+Never report "fixed" from the failures alone. Always include the unseen row.
