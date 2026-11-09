@@ -1,67 +1,48 @@
 # skills
 
-Skills for coding agents. Each skill is a plain `SKILL.md`: instructions only, no bundled code. The agent uses its own tools (web search, fetch, shell) to carry them out, so the same skill works in Claude Code and in Codex.
+A few skills I kept wishing I had while building with Claude Code and Codex. Each one is a single `SKILL.md` with plain instructions and no code. The agent does the work with the tools it already has.
 
-| Plugin | What it does |
+| Skill | What it's for |
 |---|---|
-| [silent-decisions](plugins/silent-decisions/skills/silent-decisions/SKILL.md) | Stops the agent from making important decisions silently. |
-| [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fixes a pipeline from its real failures without teaching it the test set. |
-| [priced-in](plugins/priced-in/skills/priced-in/SKILL.md) | Finds out whether a prediction market knew before the news. |
-| [reply-review](plugins/reply-review/skills/reply-review/SKILL.md) | Reviews a proposal point by point, by quoting it. |
+| [silent-decisions](plugins/silent-decisions/skills/silent-decisions/SKILL.md) | Make the agent ask before choices that come back to bite you |
+| [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fix bad outputs without just teaching the system its own examples |
+| [priced-in](plugins/priced-in/skills/priced-in/SKILL.md) | Check whether a Polymarket market moved before the news did |
+| [reply-review](plugins/reply-review/skills/reply-review/SKILL.md) | Review a plan by quoting the lines you disagree with |
 
 ## Install
 
-In Claude Code:
+Claude Code:
 
 ```
 /plugin marketplace add sk1122/skills
 /plugin install silent-decisions@sk1122
 ```
 
-Install the others the same way, for example `/plugin install priced-in@sk1122`.
+The others install the same way (`priced-in@sk1122` and so on). Installed as a plugin, a skill's command is `/<plugin>:<skill>`, for example `/silent-decisions:silent-decisions`.
 
-Or copy a skill folder into your own skills, where it becomes `/<skill name>`:
+You can also just copy the folders, and then the command is the skill's name, like `/silent-decisions`:
 
 ```bash
 git clone https://github.com/sk1122/skills
-cp -r skills/plugins/*/skills/* ~/.claude/skills/    # Claude Code
-cp -r skills/plugins/*/skills/* ~/.codex/skills/     # Codex
+cp -r skills/plugins/*/skills/* ~/.claude/skills/   # Claude Code
+cp -r skills/plugins/*/skills/* ~/.codex/skills/    # Codex
 ```
 
 ## silent-decisions
 
-Code is decisions, and an agent should make most of them by itself. A few it shouldn't make alone. These are the ones that work today but hurt the application later, often at a size or in a setting the user hasn't reached yet:
+Agents make a lot of small choices, and that's fine. The problem is the few that matter later. A store kept in memory works for the demo and falls over on real data. Other examples are a migration that drops a column, an endpoint that went public without a login, a free API the app now quietly depends on, or a default model that doubles what every run costs.
 
-- an in-memory store or one JSON file for all state, fine for a demo and slow on real data;
-- a migration that drops a column;
-- a new public endpoint with no login;
-- a free public API that the app now depends on;
-- a new default model that changes what every run costs;
-- a rule that decides which records get merged or deleted.
+These usually go by unnoticed. Even when the agent mentions them, it's as a description of how things are, not as a choice you could say no to. You find out weeks later.
 
-Agents tend to make these choices quietly. When they mention them at all, it's in passing, as how things are rather than as a choice you could have turned down. You find out weeks later, when the system slows down or the bill arrives.
+Run `/silent-decisions` at the start of a session. From then on the agent:
 
-Type `/silent-decisions` (or `/silent-decisions:silent-decisions` when installed as a plugin) at the start of a session. For the rest of that session, the agent:
+- **Checks what's already decided.** It looks at past decisions and at the code you're touching, and flags anything that no longer fits what you're asking for now. One example: "this was built in memory for small runs, and you want a nightly import of 2M rows. Change it first?"
+- **Stops and asks before a decision that matters.** That covers scale, data loss, security, new dependencies or services, API and schema contracts, cost, product rules, and anything hard to undo. It gives you two or three options and its pick. Naming, refactors and other everyday choices it just makes.
+- **Writes down what you chose** in `decisions.md` at the repo root, with what the choice depends on and when to revisit it. That's how the next session, or a different agent, knows to bring it up again.
 
-1. **Checks past decisions first.** It reads `decisions.md` and your uncommitted changes, then looks for earlier decisions that no longer fit what you're asking for now. For example: "this store was built in memory for small runs, and you've asked for a 50k-record import. Should we change it?"
-2. **Asks only about important decisions.** These are decisions that:
-   - won't scale;
-   - can lose data;
-   - change security or access;
-   - add a dependency or service;
-   - change a contract;
-   - change cost;
-   - set a product rule;
-   - are hard to undo.
+If you tell it to carry on without you, it picks the safest option it can undo, marks it pending, and tells you when you're back.
 
-   It also asks when it's about to add a requirement you never asked for. Names, refactors and anything you could undo within an hour it decides on its own.
-3. **Asks briefly.** It gives the decision, why it matters and when it would hurt, and two or three options with its recommendation first. Then it waits.
-4. **Records what you chose** in `decisions.md` at the repo root, to commit with the code. Each entry says what the decision depends on and when to revisit it. That's how later sessions, and other agents, know to raise it again.
-5. **Ends each turn that changed code with one line:** `Decisions: none new.`, `D-7 recorded.` or `Decisions pending your approval: …`.
-
-If you tell it to keep going without you, it doesn't stop. It picks the safest option it can undo, marks it pending, and lists it first when you're back.
-
-### What goes in decisions.md
+An entry looks like this:
 
 ```markdown
 ## D-3: Keep job state in Postgres, not in memory
@@ -75,7 +56,26 @@ If you tell it to keep going without you, it doesn't stop. It picks the safest o
 - Status: approved
 ```
 
-Only decisions of this size go in. Everyday code choices don't, because a list of everything stops being read.
+## fix-without-overfitting
+
+When an LLM pipeline gets something wrong, the quick fix is to make those exact examples pass, by adding a line to the prompt about the name that kept failing or nudging a threshold until the bad cases flip. It looks fixed and it isn't.
+
+This skill makes the agent write the failures down, set aside some data it won't look at, fix the cause instead of the cases, and check that no names or IDs from the failing examples ended up in the fix. Then it shows before-and-after numbers on the failures, on the set-aside data, and on cases that already worked. If only the failures improved, it says so.
+
+## priced-in
+
+Did the market know before the news broke? The agent:
+
+1. Pins down when the news actually went public, using news sites and X. It reads posts through [mdfromx.com](https://mdfromx.com).
+2. Looks for earlier leaks and hints.
+3. Pulls Polymarket prices and trades around that time.
+4. Explains each move.
+
+You get a verdict of priced in, partly priced in, or a surprise, with sources for every time it quotes. It can also score your own model's forecasts against the market.
+
+## reply-review
+
+Long plans get skimmed. With this skill the agent writes plans as short numbered blocks. You reply by quoting the lines you have thoughts on (`> like this`) and writing under them. The agent answers each quote in order, and every answer is one of four things: changed, explained, disagree, or still open. It ends with what's still open and changes nothing until you say so.
 
 ## License
 
