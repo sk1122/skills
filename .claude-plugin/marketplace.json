@@ -1,0 +1,14 @@
+{
+  "name": "sk1122",
+  "owner": { "name": "Satyam Kulkarni" },
+  "metadata": { "description": "Skills for coding agents." },
+  "plugins": [
+    {
+      "name": "silent-decisions",
+      "source": "./plugins/silent-decisions",
+      "description": "Stops coding agents from making important decisions silently: asks before choices that hurt the app later, raises past decisions that no longer fit, and records approved ones in decisions.md.",
+      "version": "0.1.0",
+      "license": "Apache-2.0"
+    }
+  ]
+}

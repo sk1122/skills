@@ -1,0 +1,9 @@
+{
+  "name": "silent-decisions",
+  "version": "0.1.0",
+  "description": "Stops coding agents from making important decisions silently: asks before choices that hurt the app later, raises past decisions that no longer fit, and records approved ones in decisions.md.",
+  "author": { "name": "Satyam Kulkarni" },
+  "repository": "https://github.com/sk1122/skills",
+  "license": "Apache-2.0",
+  "keywords": ["decisions", "architecture", "review", "agents"]
+}
