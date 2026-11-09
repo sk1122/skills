@@ -1,6 +1,6 @@
 ---
 name: silent-decisions
-description: Stop making important decisions silently. For the rest of the session, ask the user before any decision that could hurt the application later (storage that won't scale, new services or frameworks, contracts, data loss, security, cost, product rules), raise past decisions that no longer fit what the user is asking for now, and record approved ones in decisions.md at the repo root. Use when the user types /silent-decisions.
+description: Stop making important decisions silently. For the rest of the session, ask the user before any decision that could hurt the application later (storage that won't scale, new services or frameworks, contracts, data loss, security, cost, product rules), raise past decisions that no longer fit what the user is asking for now, and record approved ones in decisions.md at the repo root. Use when the user types /silent-decisions or asks you to stop making decisions silently.
 disable-model-invocation: true
 ---
 

@@ -1,0 +1,30 @@
+{
+  "name": "fix-without-overfitting",
+  "version": "0.1.0",
+  "description": "Fix a pipeline from its real failures without teaching it the test set: failure cases, a frozen held-out set, checking the fix for names and ids copied from the failures, and proof on unseen data.",
+  "author": {
+    "name": "Satyam Kulkarni"
+  },
+  "repository": "https://github.com/sk1122/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "llm",
+    "evaluation",
+    "prompts",
+    "overfitting"
+  ],
+  "homepage": "https://github.com/sk1122/skills",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "fix-without-overfitting",
+    "shortDescription": "Fix bad outputs without teaching the system its own examples.",
+    "longDescription": "Fix a pipeline from its real failures without teaching it the test set: failure cases, a frozen held-out set, checking the fix for names and ids copied from the failures, and proof on unseen data.",
+    "developerName": "Satyam Kulkarni",
+    "category": "Engineering",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ]
+  }
+}

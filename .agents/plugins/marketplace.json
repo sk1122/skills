@@ -1,0 +1,56 @@
+{
+  "name": "sk1122",
+  "interface": {
+    "displayName": "sk1122 skills"
+  },
+  "plugins": [
+    {
+      "name": "fix-without-overfitting",
+      "source": {
+        "source": "local",
+        "path": "./plugins/fix-without-overfitting"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    },
+    {
+      "name": "priced-in",
+      "source": {
+        "source": "local",
+        "path": "./plugins/priced-in"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Research"
+    },
+    {
+      "name": "reply-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/reply-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "silent-decisions",
+      "source": {
+        "source": "local",
+        "path": "./plugins/silent-decisions"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

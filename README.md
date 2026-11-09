@@ -11,21 +11,46 @@ A few skills I kept wishing I had while building with Claude Code and Codex. Eac
 
 ## Install
 
-Claude Code:
+The skills are plain `SKILL.md` files in the shared Agent Skills format, so most agents can use them. Pick yours.
+
+**Claude Code**
 
 ```
 /plugin marketplace add sk1122/skills
 /plugin install silent-decisions@sk1122
 ```
 
-The others install the same way (`priced-in@sk1122` and so on). Installed as a plugin, a skill's command is `/<plugin>:<skill>`, for example `/silent-decisions:silent-decisions`.
+The others install the same way (`priced-in@sk1122` and so on). As a plugin, a skill's command is `/<plugin>:<skill>`, for example `/silent-decisions:silent-decisions`.
 
-You can also just copy the folders, and then the command is the skill's name, like `/silent-decisions`:
+**Codex**
+
+```bash
+codex plugin marketplace add sk1122/skills
+codex plugin add silent-decisions@sk1122
+```
+
+**Gemini CLI**
+
+```bash
+gemini extensions install https://github.com/sk1122/skills
+```
+
+That installs all four.
+
+**Claude desktop and claude.ai**
+
+Download the zips from the [latest release](https://github.com/sk1122/skills/releases/latest) and upload each one under Settings → Capabilities → Skills. To build them yourself, run `./package.sh`.
+
+**Cursor, GitHub Copilot, or anything else that reads skills**
+
+Copy the folders from `skills/` into the place your tool reads skills from:
 
 ```bash
 git clone https://github.com/sk1122/skills
-cp -r skills/plugins/*/skills/* ~/.claude/skills/   # Claude Code
-cp -r skills/plugins/*/skills/* ~/.codex/skills/    # Codex
+cp -RL skills/skills/* ~/.claude/skills/     # Claude Code, without the plugin
+cp -RL skills/skills/* ~/.codex/skills/      # Codex, without the plugin
+cp -RL skills/skills/* .cursor/skills/       # Cursor, per project
+cp -RL skills/skills/* .github/skills/       # GitHub Copilot, per project
 ```
 
 ## silent-decisions
