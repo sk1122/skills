@@ -1,0 +1,16 @@
+{
+  "name": "priced-in",
+  "version": "0.1.0",
+  "description": "Find out whether a prediction market knew before the news: pin the news moment, search for earlier leaks on the web and X, pull Polymarket prices and trades, explain each move, and give a verdict.",
+  "author": {
+    "name": "Satyam Kulkarni"
+  },
+  "repository": "https://github.com/sk1122/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "prediction-markets",
+    "polymarket",
+    "research",
+    "news"
+  ]
+}
