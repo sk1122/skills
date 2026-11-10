@@ -1,0 +1,31 @@
+{
+  "name": "abstract-dont-copy",
+  "version": "0.1.0",
+  "description": "Find the mechanism behind a bug before fixing it: reproduce it, name the cause without naming the instance, find every other place it left a hole, fix at the level that closes the whole class, and add a guard shown to fail before the fix.",
+  "author": {
+    "name": "Satyam Kulkarni"
+  },
+  "repository": "https://github.com/sk1122/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "debugging",
+    "root-cause",
+    "security",
+    "refactoring",
+    "bugs"
+  ],
+  "homepage": "https://github.com/sk1122/skills",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "abstract-dont-copy",
+    "shortDescription": "Fix the mechanism, not just the hole.",
+    "longDescription": "Find the mechanism behind a bug before fixing it: reproduce it, name the cause without naming the instance, find every other place it left a hole, fix at the level that closes the whole class, and add a guard shown to fail before the fix.",
+    "developerName": "Satyam Kulkarni",
+    "category": "Engineering",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ]
+  }
+}

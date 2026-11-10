@@ -18,7 +18,14 @@
       "name": "fix-without-overfitting",
       "source": "./plugins/fix-without-overfitting",
       "description": "Fix the cause of a failure instead of making the failing cases pass: no special-casing, a check for values copied from the failures, and proof on cases the fix was not written against. For any code, including LLM and data pipelines.",
-      "version": "0.2.0",
+      "version": "0.2.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "abstract-dont-copy",
+      "source": "./plugins/abstract-dont-copy",
+      "description": "Find the mechanism behind a bug before fixing it: reproduce it, name the cause without naming the instance, find every other place it left a hole, fix at the level that closes the whole class, and add a guard shown to fail before the fix.",
+      "version": "0.1.0",
       "license": "Apache-2.0"
     },
     {

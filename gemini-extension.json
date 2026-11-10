@@ -1,5 +1,5 @@
 {
   "name": "sk1122-skills",
-  "version": "0.1.0",
-  "description": "Skills for coding agents: silent-decisions, fix-without-overfitting, priced-in and reply-review."
+  "version": "0.2.0",
+  "description": "Skills for coding agents: silent-decisions, fix-without-overfitting, abstract-dont-copy, priced-in and reply-review."
 }

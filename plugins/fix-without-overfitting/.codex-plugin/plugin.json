@@ -1,6 +1,6 @@
 {
   "name": "fix-without-overfitting",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Fix the cause of a failure instead of making the failing cases pass: no special-casing, a check for values copied from the failures, and proof on cases the fix was not written against. For any code, including LLM and data pipelines.",
   "author": {
     "name": "Satyam Kulkarni"

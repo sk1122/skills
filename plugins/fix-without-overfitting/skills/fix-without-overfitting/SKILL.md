@@ -38,6 +38,8 @@ Group the failures by the kind of mistake, not by example. Find the line, step o
 
 If every failure seems to need its own fix, you haven't found the cause yet. Keep looking.
 
+If the same cause could have left holes the failures don't show, the abstract-dont-copy skill covers finding them and fixing the whole class.
+
 ## 4. Fix it without special-casing
 
 The fix must not contain any of these:

@@ -6,6 +6,7 @@ A few skills I kept wishing I had while building with Claude Code and Codex. Eac
 |---|---|
 | [silent-decisions](plugins/silent-decisions/skills/silent-decisions/SKILL.md) | Make the agent ask before choices that come back to bite you |
 | [fix-without-overfitting](plugins/fix-without-overfitting/skills/fix-without-overfitting/SKILL.md) | Fix the cause of a failure, not just the failing cases |
+| [abstract-dont-copy](plugins/abstract-dont-copy/skills/abstract-dont-copy/SKILL.md) | Fix what let a bug happen, everywhere it happened |
 | [priced-in](plugins/priced-in/skills/priced-in/SKILL.md) | Check whether a Polymarket market moved before the news did |
 | [reply-review](plugins/reply-review/skills/reply-review/SKILL.md) | Review a plan by quoting the lines you disagree with |
 
@@ -35,7 +36,7 @@ codex plugin add silent-decisions@sk1122
 gemini extensions install https://github.com/sk1122/skills
 ```
 
-That installs all four.
+That installs all five.
 
 **Claude desktop and claude.ai**
 
@@ -86,6 +87,14 @@ An entry looks like this:
 When a test fails, there's a cheap way to make it pass: hard-code the expected value, add an `if` for that one input, bump the timeout until the flaky test goes green, or just edit the test. Coding agents do this more than you'd think when they get stuck. With LLM pipelines it looks like a prompt line about the exact example that went wrong.
 
 This skill makes the agent fix the cause instead. Before touching anything, it sets up a check on inputs the fix won't have seen: new test cases with different values for ordinary code, or a held-back sample for data and LLM pipelines. After the fix, it searches its own diff for values copied from the failures and shows before-and-after results on the failures, the unseen cases, and the cases that already worked. If only the failures improved, it says so.
+
+## abstract-dont-copy
+
+A bug report names one hole: Bob can read Alice's order. Usually the same cause left others nearby, like cancelling someone else's order or reading their invoice, because every handler checks access by hand and some forget. Patch the one in the report and the rest stay open.
+
+With this skill the agent reproduces the bug, then names the cause in one sentence without naming the file. It searches for every other place that cause shows up, and sorts each hit as a hole, safe, or intended (an admin route that reads anyone's order on purpose). Then it fixes at the smallest level that closes all of them, and adds a test that finds the cases itself, shown failing before the fix. Before a bigger change it checks with you, and patches the serious holes while it waits. A one-off typo gets a three-line note, not the full treatment.
+
+It pairs with fix-without-overfitting: that one stops the fix from cheating on the failing cases, and this one makes sure the fix reaches every case.
 
 ## priced-in
 
